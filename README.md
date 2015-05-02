@@ -4,6 +4,8 @@ simple-node-server
 * A simple node.js server to serve files.
 * Colored console output to easily distinguish request information.
 
+![alt tag](https://cloud.githubusercontent.com/assets/6268662/7440520/983e149c-f0d8-11e4-9622-0431a40c2b51.png)
+
 ## Usage
 
 It comes with the following options
@@ -44,7 +46,7 @@ var	defaults = {
 		appcache: 'text/cache-manifest'
 	},
 	
-	//available errors
+	//default errors
 	errors: {
 		404: 'Not Found',
 		415: 'Unsupported Media Type',
