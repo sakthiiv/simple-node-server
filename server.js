@@ -2,9 +2,9 @@ var http    = require('http'),
     url     = require('url'),
     path    = require('path'),
     fs      = require('fs'),
-	util	= require('util');
+    util    = require('util');
 		
-var	defaults = {
+var defaults = {
 	port: 4040,
 	index: 'index.html',
 	root: 'public',
@@ -23,7 +23,8 @@ var	defaults = {
 		png     : 'image/png',
 		gif     : 'image/gif',
 		ico     : 'image/x-icon',
-		appcache: 'text/cache-manifest'
+		appcache: 'text/cache-manifest',
+		mp4		: 'video/mp4'
 	},
 	errors: {
 		404: 'Not Found',
@@ -75,6 +76,9 @@ function alterResponse(response, body, status, headers, encoding) {
 
 	if (!headers)
 		headers = defaults.contentTypeDef;
+		
+	if (defaults.noCache)
+		headers['Cache-Control'] = 'no-cache, no-store, must-revalidate';
 	
 	if(!encoding)
 		encoding='utf8';
@@ -101,28 +105,28 @@ function deliverFile(filename, exists, response) {
 		alterResponse(response, defaults.errors['415'], 415, defaults.contentTypeDef);
 		return;
 	}
+	var readStream = fs.createReadStream(filename);
+	
+	readStream.on('open', function(){
+		var headers = {
+			'Content-Type' : defaults.contentType[contentType]
+		};
 
-	fs.readFile(
-		filename,
-		'binary',
-		function(err, file) {
-			if (err) {
-				alterResponse(response, defaults.errors['500'] + err, 500, defaults.contentTypeDef);
-				console.log(util.inspect(err));
-				return;
-			}
-
-			var headers = {
-				'Content-Type' : defaults.contentType[contentType]
-			};
-
-			if (defaults.noCache)
-				headers['Cache-Control'] = 'no-cache, no-store, must-revalidate';
-
-			alterResponse(response, file, 200, headers, 'binary');
-			return;
-		}
-	);
+		if (defaults.noCache)
+			headers['Cache-Control'] = 'no-cache, no-store, must-revalidate';
+			
+		response.writeHead(
+			200,
+			headers
+		);
+			
+		readStream.pipe(response);
+	});
+	
+	readStream.on('error', function(){
+		alterResponse(response, defaults.errors['500'] + err, 500, defaults.contentTypeDef);
+		console.log(util.inspect(err));
+	});
 }
 
 server.listen(defaults.port, function() {
