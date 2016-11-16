@@ -24,7 +24,8 @@ var defaults = {
 		gif     : 'image/gif',
 		ico     : 'image/x-icon',
 		appcache: 'text/cache-manifest',
-		mp4		: 'video/mp4'
+		mp4		: 'video/mp4',
+		woff	: 'application/x-font-woff'
 	},
 	errors: {
 		404: 'Not Found',
